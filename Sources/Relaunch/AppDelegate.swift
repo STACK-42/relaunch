@@ -53,6 +53,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         installHotKey()
         installHotCorner()
         watchApplicationFolders()
+        watchWallpaper()
 
         let nc = NotificationCenter.default
         nc.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
@@ -61,8 +62,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             self.model.hide()
         }
         nc.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
+            Wallpaper.prewarm()
             guard let self, self.isShown, let screen = self.window.screen else { return }
             self.place(on: screen)
+        }
+        // Each Space can have its own wallpaper.
+        NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { _ in
+            Wallpaper.prewarm()
         }
 
         if !launchedAtLogin { show() }
@@ -83,15 +90,37 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let mouse = NSEvent.mouseLocation
         let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main!
         place(on: screen)
-        Wallpaper.blurred(for: screen) { [weak self] image in self?.model.wallpaper = image }
         model.prepareToShow()
+
+        // The background must be final before the fade starts. Normally it was
+        // rendered ahead of time; on a cold start, wait briefly for it, and if
+        // it's still late, cross-fade it in rather than swapping it.
+        var started = false
+        let start = { [weak self] in
+            guard let self, !started else { return }
+            started = true
+            self.model.animateIn()
+            debugLog("animate in, wallpaper ready=\(self.model.wallpaper != nil) key=\(self.window.isKeyWindow)")
+        }
+        if let ready = Wallpaper.cached(for: screen) {
+            model.wallpaper = ready
+            DispatchQueue.main.async(execute: start)
+        } else {
+            Wallpaper.blurred(for: screen) { [weak self] image in
+                guard let self else { return }
+                if started {
+                    withAnimation(.easeInOut(duration: 0.35)) { self.model.wallpaper = image }
+                } else {
+                    self.model.wallpaper = image
+                    DispatchQueue.main.async(execute: start)
+                }
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: start)
+        }
+
         NSApp.unhide(nil)
         window.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
-        DispatchQueue.main.async {
-            self.model.animateIn()
-            debugLog("next tick key=\(self.window.isKeyWindow) active=\(NSApp.isActive)")
-        }
         debugLog("show on \(screen.frame) visible=\(window.isVisible) key=\(window.isKeyWindow) active=\(NSApp.isActive)")
     }
 
@@ -154,6 +183,29 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         if hit && cornerArmed { cornerArmed = false; toggle() }
         if !hit { cornerArmed = true }
+    }
+
+    // MARK: Wallpaper
+
+    /// Re-renders the blurred wallpaper when the user picks a new one, so the
+    /// next open never has to wait for it.
+    private func watchWallpaper() {
+        Wallpaper.prewarm()
+        let store = FileManager.default.homeDirectoryForCurrentUser
+            .appendingPathComponent("Library/Application Support/com.apple.wallpaper/Store")
+        let fd = open(store.path, O_EVTONLY)
+        guard fd >= 0 else { return }
+        let src = DispatchSource.makeFileSystemObjectSource(fileDescriptor: fd, eventMask: [.write, .rename], queue: .main)
+        var pending: DispatchWorkItem?
+        src.setEventHandler {
+            pending?.cancel()
+            let work = DispatchWorkItem { Wallpaper.prewarm() }
+            pending = work
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5, execute: work)
+        }
+        src.setCancelHandler { close(fd) }
+        src.resume()
+        watchers.append(src)
     }
 
     // MARK: Installs and removals

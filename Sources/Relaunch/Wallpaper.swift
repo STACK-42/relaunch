@@ -33,6 +33,18 @@ enum Wallpaper {
         }
     }
 
+    /// The blurred wallpaper if it's already rendered. Opening must never wait
+    /// on rendering: swapping the background in mid-animation is what made the
+    /// first open flash from a soft blur to a dark, saturated one.
+    static func cached(for screen: NSScreen) -> NSImage? {
+        current(for: screen).flatMap { cache[$0.url.path] }
+    }
+
+    /// Renders ahead of time, so the next open finds it in `cached(for:)`.
+    static func prewarm() {
+        for screen in NSScreen.screens { blurred(for: screen) { _ in } }
+    }
+
     /// `desktopImageURL` only knows classic still pictures. Since macOS 14 the
     /// real choice lives in the wallpaper agent's store, and for the default
     /// dynamic wallpapers (aerials) the API just returns DefaultDesktop.heic.
@@ -77,8 +89,9 @@ enum Wallpaper {
         let output = input.clampedToExtent()
             .applyingGaussianBlur(sigma: 18)
             .cropped(to: input.extent)
+            // Dim slightly but keep the wallpaper's own colours: Launchpad
+            // blurred and darkened the desktop picture, it didn't saturate it.
             .applyingFilter("CIColorControls", parameters: [
-                kCIInputSaturationKey: 1.15,
                 kCIInputBrightnessKey: -0.04,
             ])
         guard let out = context.createCGImage(output, from: input.extent) else { return nil }
