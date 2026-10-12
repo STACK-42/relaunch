@@ -2,8 +2,8 @@
 
 These findings come from inspecting a macOS 27.0 (build 26A428) system with
 stock tools: `strings`, `nm -u`, `otool -L`, `plutil` and `sqlite3`. Nothing
-was disassembled or decompiled, and no Apple code or artwork is in this
-repository. Each command below can be re-run to check a claim.
+was disassembled or decompiled, and no Apple code is in this repository.
+The app ships no Apple artwork. Each command below can be re-run to check a claim.
 
 ## 1. Launchpad.app is gone, and its replacement is a stub
 

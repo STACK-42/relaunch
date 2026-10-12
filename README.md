@@ -1,4 +1,18 @@
-# Relaunch
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="website/assets/icon-dark.png">
+    <img src="website/assets/icon.png" alt="Relaunch app icon" width="128" height="128">
+  </picture>
+</p>
+
+<h1 align="center">Relaunch</h1>
+
+<p align="center">
+  <a href="https://github.com/STACK-42/relaunch/actions/workflows/ci.yml"><img src="https://github.com/STACK-42/relaunch/actions/workflows/ci.yml/badge.svg?branch=main" alt="CI status"></a>
+  <a href="https://github.com/STACK-42/relaunch/releases/latest"><img src="https://img.shields.io/github/v/release/STACK-42/relaunch?label=release" alt="Latest release"></a>
+  <img src="https://img.shields.io/badge/macOS-14%2B-555" alt="macOS 14 or later">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-555" alt="MIT license"></a>
+</p>
 
 A full-screen, paged app launcher for macOS 14 and later. It brings back the
 grid you swipe left and right that Launchpad used to provide, including
@@ -9,7 +23,8 @@ macOS left on disk. See [docs/RESEARCH.md](docs/RESEARCH.md) for how Apple's
 version worked and what replaced it.
 
 > Not affiliated with or endorsed by Apple Inc. "Launchpad" and "macOS" are
-> trademarks of Apple Inc. This project contains no Apple code or artwork.
+> trademarks of Apple Inc. Relaunch contains no Apple code or artwork; the
+> website screenshots show the apps installed on the author's Mac.
 
 ## Install
 
