@@ -11,13 +11,29 @@ version worked and what replaced it.
 > Not affiliated with or endorsed by Apple Inc. "Launchpad" and "macOS" are
 > trademarks of Apple Inc. This project contains no Apple code or artwork.
 
-## Build and install
+## Install
 
-Requires only the Xcode Command Line Tools (`xcode-select --install`).
+Requires macOS 14 Sonoma or later. The first two options are Apple silicon builds.
+
+**Download:** get [Relaunch.dmg](https://github.com/STACK-42/relaunch/releases/latest/download/Relaunch.dmg),
+open it and drag Relaunch to Applications. The app isn't notarized yet, so if
+macOS refuses to open it, go to System Settings → Privacy & Security → Open Anyway.
+
+**Terminal:** downloads the latest release, verifies its SHA-256 checksum,
+installs it and opens it ([read the script](scripts/install.sh)):
+
+```sh
+curl -fsSL https://relaunch.stack42.tech/install.sh | bash
+curl -fsSL https://relaunch.stack42.tech/install.sh | bash -s -- --uninstall   # remove
+```
+
+**Build it yourself** (also works on Intel). Needs only the Xcode Command
+Line Tools (`xcode-select --install`):
 
 ```sh
 scripts/build.sh            # builds build/Relaunch.app
 scripts/build.sh --install  # also copies it to /Applications
+scripts/package.sh          # builds dist/Relaunch.dmg and .zip with checksums
 ```
 
 Drag `Relaunch.app` into the Dock. Clicking it opens and closes the launcher,

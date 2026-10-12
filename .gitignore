@@ -2,3 +2,6 @@
 build/
 .DS_Store
 notes/
+dist/
+# Local preview link; the Pages workflow copies scripts/install.sh here.
+website/install.sh

@@ -1,6 +1,7 @@
 name: Release
 
-# Push a tag like v1.0.0 to publish Relaunch.zip on a GitHub Release.
+# Push a tag like v1.0.0 to publish a GitHub Release with Relaunch.dmg,
+# Relaunch.zip (used by scripts/install.sh) and their SHA-256 files.
 on:
   push:
     tags: ["v*"]
@@ -18,13 +19,12 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           plutil -replace CFBundleShortVersionString -string "$VERSION" Resources/Info.plist
           plutil -replace CFBundleVersion -string "$GITHUB_RUN_NUMBER" Resources/Info.plist
-      - name: Build
-        run: scripts/build.sh
-      - name: Zip
-        run: ditto -c -k --keepParent build/Relaunch.app Relaunch.zip
+      - name: Build and package
+        run: scripts/package.sh
       - name: Publish release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create "$GITHUB_REF_NAME" Relaunch.zip \
+          gh release create "$GITHUB_REF_NAME" dist/Relaunch.dmg dist/Relaunch.zip \
+            dist/Relaunch.dmg.sha256 dist/Relaunch.zip.sha256 \
             --title "Relaunch $GITHUB_REF_NAME" --generate-notes
