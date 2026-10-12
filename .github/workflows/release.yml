@@ -1,0 +1,30 @@
+name: Release
+
+# Push a tag like v1.0.0 to publish Relaunch.zip on a GitHub Release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Stamp version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          plutil -replace CFBundleShortVersionString -string "$VERSION" Resources/Info.plist
+          plutil -replace CFBundleVersion -string "$GITHUB_RUN_NUMBER" Resources/Info.plist
+      - name: Build
+        run: scripts/build.sh
+      - name: Zip
+        run: ditto -c -k --keepParent build/Relaunch.app Relaunch.zip
+      - name: Publish release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" Relaunch.zip \
+            --title "Relaunch $GITHUB_REF_NAME" --generate-notes

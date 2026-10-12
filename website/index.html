@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Relaunch</title>
+  <meta name="description" content="The paged app grid, back on your Mac. A free, open-source launcher for macOS 14 and later that restores your old Launchpad layout.">
+  <meta property="og:title" content="Relaunch">
+  <meta property="og:description" content="The paged app grid, back on your Mac.">
+  <meta property="og:url" content="https://relaunch.stack42.tech/">
+  <meta property="og:image" content="https://relaunch.stack42.tech/assets/icon.png">
+  <link rel="canonical" href="https://relaunch.stack42.tech/">
+  <link rel="icon" href="assets/favicon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="nav">
+    <a class="brand" href="#top"><img src="assets/icon.png" alt="" width="28" height="28">Relaunch</a>
+    <nav>
+      <a href="#features">Features</a>
+      <a href="#install">Install</a>
+      <a href="#faq">FAQ</a>
+      <a href="https://github.com/STACK-42/relaunch">GitHub</a>
+    </nav>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <img class="hero-icon" src="assets/icon.png" alt="Relaunch app icon" width="128" height="128">
+      <h1>The paged app grid,<br>back on your Mac.</h1>
+      <p class="lede">Relaunch brings back the full-screen grid you swipe left and right, with folders,
+        drag to rearrange and instant search. On first launch it restores the layout you already had.</p>
+      <div class="cta">
+        <a class="button primary" href="https://github.com/STACK-42/relaunch/releases/latest">Download for macOS</a>
+        <a class="button" href="#install">Build from source</a>
+      </div>
+      <p class="fine">Free and open source · macOS 14 Sonoma or later · Apple silicon</p>
+    </section>
+
+    <section class="demo-wrap" aria-label="Interactive demo">
+      <div class="demo" id="demo" tabindex="0">
+        <div class="demo-search">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5"/><path d="M10.5 10.5 14 14"/></svg>
+          <input id="demo-query" type="search" placeholder="Search" aria-label="Search demo apps" autocomplete="off">
+        </div>
+        <div class="demo-viewport">
+          <div class="demo-track" id="demo-track"></div>
+        </div>
+        <div class="demo-dots" id="demo-dots" role="tablist" aria-label="Pages"></div>
+        <div class="demo-folder" id="demo-folder" hidden>
+          <div class="demo-folder-panel" role="dialog" aria-modal="true" aria-labelledby="demo-folder-title">
+            <h3 id="demo-folder-title"></h3>
+            <div class="demo-folder-grid" id="demo-folder-grid"></div>
+          </div>
+        </div>
+      </div>
+      <p class="demo-hint">Try it: swipe or drag sideways, click the dots, open the folder, or type to search.
+        The apps here are made up.</p>
+    </section>
+
+    <section id="features" class="features">
+      <h2>Everything you remember</h2>
+      <div class="feature-grid">
+        <article>
+          <h3>Your layout, restored</h3>
+          <p>macOS kept Launchpad's database after the upgrade. Relaunch reads it once and puts your
+            pages and folders back exactly as they were. It never changes the original file.</p>
+        </article>
+        <article>
+          <h3>Swipe between pages</h3>
+          <p>Pages follow your fingers, rubber-band at the ends and snap on a flick. A mouse wheel,
+            ⌘← ⌘→ and the page dots work too.</p>
+        </article>
+        <article>
+          <h3>Folders that feel right</h3>
+          <p>Drop one app on another to make a folder, named after the apps' category. Rename it
+            in place, drag apps out, or ungroup it in one click.</p>
+        </article>
+        <article>
+          <h3>Search as you type</h3>
+          <p>Matches the start of any word, initials like “vsc”, and ignores accents. Arrow keys
+            and Return launch without touching the mouse.</p>
+        </article>
+        <article>
+          <h3>Instant</h3>
+          <p>Relaunch stays running in the background, as Launchpad did inside the Dock. It finds
+            115 apps in about 50 ms and uses no CPU while idle.</p>
+        </article>
+        <article>
+          <h3>No permissions</h3>
+          <p>Open it from the Dock, with <kbd>⌥</kbd><kbd>Space</kbd>, or from a hot corner.
+            No Accessibility access, no private APIs, no tracking.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="install" class="install">
+      <h2>Install</h2>
+      <ol>
+        <li>Download <code>Relaunch.zip</code> from the
+          <a href="https://github.com/STACK-42/relaunch/releases/latest">latest release</a> and move
+          <strong>Relaunch.app</strong> to Applications.</li>
+        <li>The app isn't notarized yet, so the first time, right-click it and choose
+          <strong>Open</strong>.</li>
+        <li>Drag it into your Dock. Clicking the icon opens and closes the grid.</li>
+      </ol>
+      <h3>Or build it yourself</h3>
+      <pre><code>xcode-select --install
+git clone https://github.com/STACK-42/relaunch.git
+cd relaunch
+scripts/build.sh --install</code></pre>
+    </section>
+
+    <section id="faq" class="faq">
+      <h2>Questions</h2>
+      <details>
+        <summary>Can it open with the four-finger pinch or the F4 key?</summary>
+        <p>No. macOS's Dock captures both before any app sees them. Taking them over would need
+          private APIs, so Relaunch uses the Dock icon, a keyboard shortcut and an optional hot
+          corner instead.</p>
+      </details>
+      <details>
+        <summary>How do I change the shortcut or the grid size?</summary>
+        <p>With <code>defaults</code>, then restart Relaunch:</p>
+        <pre><code>defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"
+defaults write com.ahmedalghali.Relaunch columns -int 8
+defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft</code></pre>
+      </details>
+      <details>
+        <summary>I never used Launchpad. Does it still work?</summary>
+        <p>Yes. Without an old layout it starts with Apple's apps first, utilities in an “Other”
+          folder, and everything else alphabetically.</p>
+      </details>
+      <details>
+        <summary>How do I uninstall it?</summary>
+        <p>Quit it from the right-click menu on the background, then delete the app and
+          <code>~/Library/Application Support/Relaunch</code>.</p>
+      </details>
+      <details>
+        <summary>How was it built?</summary>
+        <p>The project's research notes explain how Apple's original worked, based only on
+          inspecting the system. Relaunch's code is original and uses public APIs.
+          <a href="https://github.com/STACK-42/relaunch/blob/main/docs/RESEARCH.md">Read the notes</a>.</p>
+      </details>
+    </section>
+  </main>
+
+  <footer>
+    <p>Relaunch is MIT-licensed open source.
+      <a href="https://github.com/STACK-42/relaunch">Source on GitHub</a>.</p>
+    <p class="fine">Not affiliated with or endorsed by Apple Inc. Launchpad, Mac and macOS are
+      trademarks of Apple Inc.</p>
+  </footer>
+
+  <script src="demo.js"></script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:launcher}",
+            "name": "Debug Relaunch",
+            "target": "Relaunch",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug Relaunch"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:launcher}",
+            "name": "Release Relaunch",
+            "target": "Relaunch",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release Relaunch"
+        }
+    ]
+}

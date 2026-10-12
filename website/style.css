@@ -1,0 +1,358 @@
+:root {
+  --bg: #f5f5f7;
+  --surface: #ffffff;
+  --text: #1d1d1f;
+  --muted: #6e6e73;
+  --line: rgba(0, 0, 0, 0.1);
+  --accent: #5b4bdb;
+  --accent-text: #ffffff;
+  --code-bg: #ebebf0;
+  --radius: 18px;
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --mono: ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #000000;
+    --surface: #161618;
+    --text: #f5f5f7;
+    --muted: #a1a1a6;
+    --line: rgba(255, 255, 255, 0.12);
+    --accent: #8b7dff;
+    --accent-text: #0b0820;
+    --code-bg: #1f1f23;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #000000;
+  --surface: #161618;
+  --text: #f5f5f7;
+  --muted: #a1a1a6;
+  --line: rgba(255, 255, 255, 0.12);
+  --accent: #8b7dff;
+  --accent-text: #0b0820;
+  --code-bg: #1f1f23;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 17px/1.5 var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+code, pre, kbd { font-family: var(--mono); font-size: 0.88em; }
+code { background: var(--code-bg); padding: 0.1em 0.35em; border-radius: 6px; }
+pre {
+  background: var(--code-bg);
+  padding: 16px 18px;
+  border-radius: 12px;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+pre code { background: none; padding: 0; }
+kbd {
+  border: 1px solid var(--line);
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 0 0.4em;
+  margin: 0 1px;
+  background: var(--surface);
+}
+
+/* Navigation */
+.nav {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px max(16px, calc((100% - 1080px) / 2));
+  background: color-mix(in srgb, var(--bg) 80%, transparent);
+  backdrop-filter: saturate(180%) blur(20px);
+  -webkit-backdrop-filter: saturate(180%) blur(20px);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 600;
+}
+.brand:hover { text-decoration: none; }
+.nav nav { display: flex; gap: 20px; font-size: 14px; }
+.nav nav a { color: var(--muted); }
+.nav nav a:hover { color: var(--text); text-decoration: none; }
+
+main, footer { padding: 0 16px; }
+
+section { max-width: 1080px; margin: 0 auto; }
+
+/* Hero */
+.hero { text-align: center; padding: 72px 0 40px; }
+.hero-icon { filter: drop-shadow(0 12px 24px rgba(60, 40, 160, 0.25)); }
+h1 {
+  font-size: clamp(36px, 7vw, 64px);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin: 24px 0 16px;
+}
+.lede { max-width: 640px; margin: 0 auto; color: var(--muted); font-size: clamp(17px, 2.2vw, 21px); }
+.cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin: 32px 0 12px; }
+.button {
+  display: inline-block;
+  padding: 12px 22px;
+  border-radius: 980px;
+  border: 1px solid var(--line);
+  color: var(--text);
+  font-weight: 500;
+}
+.button:hover { text-decoration: none; background: var(--surface); }
+.button.primary { background: var(--accent); color: var(--accent-text); border-color: transparent; }
+.button.primary:hover { filter: brightness(1.08); background: var(--accent); }
+.fine { color: var(--muted); font-size: 13px; }
+
+/* Demo: a miniature launcher. Colors here are fixed because the demo always
+   sits on its own wallpaper, whatever the page theme. */
+.demo-wrap { padding: 24px 0 64px; }
+.demo {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  max-height: 680px;
+  width: 100%;
+  border-radius: 24px;
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(ellipse at 20% 15%, #8f86b8 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 30%, #2e4f8f 0%, transparent 50%),
+    radial-gradient(ellipse at 30% 85%, #b0702a 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 90%, #3a1f2e 0%, transparent 60%),
+    #4a4256;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.35);
+  user-select: none;
+  touch-action: pan-y;
+  outline: none;
+}
+.demo:focus-visible { box-shadow: 0 0 0 3px var(--accent), 0 30px 80px rgba(0, 0, 0, 0.35); }
+
+.demo-search {
+  position: absolute;
+  top: 4.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(240px, 60%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 2;
+}
+.demo-search svg { width: 13px; height: 13px; fill: none; stroke: rgba(255, 255, 255, 0.75); stroke-width: 1.6; flex: none; }
+.demo-search input {
+  all: unset;
+  width: 100%;
+  font: 13px var(--font);
+  color: #fff;
+}
+.demo-search input::placeholder { color: rgba(255, 255, 255, 0.6); }
+
+.demo-viewport { position: absolute; inset: 12% 0 11% 0; overflow: hidden; }
+.demo-track {
+  display: flex;
+  height: 100%;
+  transition: transform 0.45s cubic-bezier(0.2, 0.9, 0.25, 1);
+  will-change: transform;
+}
+.demo-track.dragging { transition: none; }
+.demo-page {
+  flex: 0 0 100%;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), 1fr);
+  grid-template-rows: repeat(var(--rows), 1fr);
+  padding: 0 9%;
+  align-items: center;
+  justify-items: center;
+}
+
+.tile {
+  all: unset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.tile:focus-visible .art { outline: 2px solid #fff; outline-offset: 3px; }
+.art {
+  width: clamp(30px, 6.2vw, 64px);
+  aspect-ratio: 1;
+  border-radius: 23%;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  transition: transform 0.2s;
+}
+.tile:active .art { transform: scale(0.92); filter: brightness(0.85); }
+.art svg { width: 54%; height: 54%; fill: none; stroke: #fff; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.art.folder {
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+/* Percent padding would resolve against the grid cell, so size the 3×3
+   preview as a box inside the tile instead; grid gaps resolve against it. */
+.minis {
+  width: 74%;
+  height: 74%;
+  display: grid;
+  grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+  gap: 9%;
+}
+.minis i { display: block; border-radius: 28%; }
+.label {
+  font-size: clamp(9px, 1.1vw, 12px);
+  font-weight: 500;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.tile.launching .art { animation: launch 0.5s ease-out; }
+@keyframes launch {
+  40% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.demo-empty { grid-column: 1 / -1; grid-row: 1 / -1; color: rgba(255, 255, 255, 0.6); font-size: 18px; }
+
+.demo-dots {
+  position: absolute;
+  bottom: 4.5%;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 2px;
+}
+.demo-dots button {
+  all: unset;
+  width: 7px;
+  height: 7px;
+  padding: 4px;
+  cursor: pointer;
+}
+.demo-dots button::before {
+  content: "";
+  display: block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  transition: background 0.2s;
+}
+.demo-dots button[aria-selected="true"]::before { background: rgba(255, 255, 255, 0.95); }
+
+.demo-folder {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  z-index: 3;
+  animation: fade 0.25s ease-out;
+}
+.demo-folder[hidden] { display: none; }
+.demo-folder-panel {
+  width: 84%;
+  padding: 2% 4% 3%;
+  border-radius: 26px;
+  background: rgba(255, 255, 255, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  animation: pop 0.3s cubic-bezier(0.2, 0.9, 0.25, 1.1);
+}
+.demo-folder-panel h3 { text-align: center; margin: 0.4em 0 0.8em; font-size: clamp(16px, 2.4vw, 26px); }
+.demo-folder-grid { display: grid; grid-template-columns: repeat(var(--cols), 1fr); row-gap: 18px; }
+@keyframes fade { from { opacity: 0; } }
+@keyframes pop { from { opacity: 0; transform: scale(0.92); } }
+
+.demo-hint { text-align: center; color: var(--muted); font-size: 14px; margin-top: 16px; }
+
+/* Content sections */
+h2 { font-size: clamp(28px, 4.5vw, 44px); letter-spacing: -0.015em; text-align: center; margin: 0 0 32px; }
+.features, .install, .faq { padding: 48px 0; }
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+.feature-grid article {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+.feature-grid h3 { margin: 0 0 8px; font-size: 19px; }
+.feature-grid p { margin: 0; color: var(--muted); font-size: 15px; }
+
+.install { max-width: 720px; }
+.install ol { padding-left: 1.2em; }
+.install li { margin-bottom: 10px; }
+.install h3 { margin-top: 32px; }
+
+.faq { max-width: 720px; }
+.faq details {
+  border-bottom: 1px solid var(--line);
+  padding: 16px 0;
+}
+.faq summary { cursor: pointer; font-weight: 600; }
+.faq details p { color: var(--muted); margin: 10px 0 0; }
+
+footer {
+  text-align: center;
+  padding: 48px 16px 64px;
+  border-top: 1px solid var(--line);
+  margin-top: 48px;
+  font-size: 14px;
+}
+footer p { margin: 4px 0; }
+
+@media (max-width: 640px) {
+  .nav nav { gap: 14px; }
+  .nav nav a:not(:last-child):nth-child(n+3) { display: none; }
+  .demo { aspect-ratio: 3 / 4; border-radius: 18px; }
+  .demo-page { padding: 0 5%; }
+  .demo-folder-panel { width: 92%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .demo-track, .art, .demo-dots button::before { transition: none; }
+  .demo-folder, .demo-folder-panel, .tile.launching .art { animation: none; }
+}

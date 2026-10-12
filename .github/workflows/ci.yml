@@ -1,0 +1,20 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+    paths-ignore: ["website/**", "docs/**", "**.md"]
+  pull_request:
+    paths-ignore: ["website/**", "docs/**", "**.md"]
+
+jobs:
+  build:
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build app bundle
+        run: scripts/build.sh
+      - name: Check the bundle launches its binary
+        run: |
+          test -x build/Relaunch.app/Contents/MacOS/Relaunch
+          codesign --verify --verbose build/Relaunch.app

@@ -1,0 +1,3 @@
+# Keep the website out of "Download ZIP" and release source archives.
+# It lives in the repo only so GitHub Pages can publish it.
+website/ export-ignore

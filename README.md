@@ -82,4 +82,3 @@ because both are captured by the Dock (see the research notes).
 ## License
 
 MIT. See [LICENSE](LICENSE).
-# relaunch
