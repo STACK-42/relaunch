@@ -51,13 +51,16 @@ struct BackgroundView: View {
 
     var body: some View {
         ZStack {
-            VisualEffectBackground()
+            // Fallback only, for wallpapers that can't be read as an image: it
+            // blurs the windows behind us, which Launchpad never showed.
+            if model.wallpaper == nil { VisualEffectBackground() }
             if let img = model.wallpaper {
                 Image(nsImage: img)
                     .resizable()
                     .aspectRatio(contentMode: .fill)
                     .frame(width: model.size.width, height: model.size.height)
                     .clipped()
+                    .transition(.opacity)
             }
             Color.black.opacity(0.2)
         }
