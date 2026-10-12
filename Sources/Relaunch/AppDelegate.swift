@@ -2,10 +2,15 @@ import AppKit
 import SwiftUI
 
 /// Full-screen, borderless, above the Dock and menu bar, on every Space.
-final class RelaunchWindow: NSWindow {
+/// A non-activating panel, so it can take the keyboard even when macOS
+/// refuses to activate the app (cooperative activation, macOS 14+) while
+/// another app such as VS Code or Chrome is frontmost.
+final class RelaunchWindow: NSPanel {
     init(model: RelaunchModel) {
-        super.init(contentRect: NSScreen.main?.frame ?? .zero, styleMask: [.borderless],
+        super.init(contentRect: NSScreen.main?.frame ?? .zero, styleMask: [.borderless, .nonactivatingPanel],
                    backing: .buffered, defer: false)
+        hidesOnDeactivate = false
+        becomesKeyOnlyIfNeeded = false
         level = NSWindow.Level(rawValue: NSWindow.Level.mainMenu.rawValue + 1)
         collectionBehavior = [.canJoinAllSpaces, .fullScreenAuxiliary, .stationary, .ignoresCycle]
         isOpaque = false
@@ -59,6 +64,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         nc.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
             guard let self, self.isShown else { return }
             debugLog("resigned active -> hide")
+            self.model.hide()
+        }
+        // The panel can be key while the app is inactive, so also hide when
+        // another window or app takes the keyboard.
+        nc.addObserver(forName: NSWindow.didResignKeyNotification, object: window, queue: .main) { [weak self] _ in
+            guard let self, self.isShown else { return }
+            debugLog("resigned key -> hide")
             self.model.hide()
         }
         nc.addObserver(forName: NSApplication.didChangeScreenParametersNotification, object: nil, queue: .main) { [weak self] _ in
@@ -119,8 +131,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         NSApp.unhide(nil)
+        if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
         window.makeKeyAndOrderFront(nil)
-        NSApp.activate(ignoringOtherApps: true)
         debugLog("show on \(screen.frame) visible=\(window.isVisible) key=\(window.isKeyWindow) active=\(NSApp.isActive)")
     }
 
