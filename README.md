@@ -54,6 +54,31 @@ scripts/package.sh          # builds dist/Relaunch.dmg and .zip with checksums
 Drag `Relaunch.app` into the Dock. Clicking it opens and closes the launcher,
 like Launchpad's Dock tile.
 
+## If macOS won't open it
+
+Releases aren't notarized by Apple yet, so a browser-downloaded copy may show
+*"Apple could not verify 'Relaunch' is free of malware"*. Any one of these works:
+
+- **Open Anyway:** try to open it once, then go to System Settings → Privacy &
+  Security, and under Security click **Open Anyway**.
+- **Install from Terminal** with the command above. Terminal downloads aren't
+  flagged as coming from the internet, so there's no warning.
+- **Clear the flag** on a copy you already have:
+  `xattr -dr com.apple.quarantine /Applications/Relaunch.app`
+
+## Bring back the pinch gesture
+
+macOS keeps the thumb-and-three-fingers pinch for its own Apps view, and apps
+can't receive it. To make it open Relaunch instead:
+
+1. System Settings → Trackpad → More Gestures → turn off **Apps**.
+2. In a gesture app such as [BetterTouchTool](https://folivora.ai), add a
+   Trackpad trigger for a four- or five-finger pinch in, with the action
+   **Open Application → Relaunch**. Opening Relaunch while it's running closes
+   it, so the same pinch toggles it.
+
+Without extra apps: ⌥Space, the Dock icon, or a hot corner (see Settings).
+
 ## Using it
 
 | Action | How |

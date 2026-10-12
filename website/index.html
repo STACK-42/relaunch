@@ -34,6 +34,7 @@
     <nav>
       <a href="#features">Features</a>
       <a href="#install">Install</a>
+      <a href="#help">Help</a>
       <a href="#faq">FAQ</a>
       <a href="https://github.com/STACK-42/relaunch">GitHub</a>
     </nav>
@@ -116,8 +117,8 @@
           <h3>Download</h3>
           <p>The usual way: open the disk image and drag Relaunch to Applications.</p>
           <a class="button primary" href="https://github.com/STACK-42/relaunch/releases/latest/download/Relaunch.dmg">Download Relaunch.dmg</a>
-          <p class="note">The app isn't notarized by Apple yet. If macOS says it can't be opened, go to
-            <strong>System Settings → Privacy &amp; Security</strong> and click <strong>Open Anyway</strong>.</p>
+          <p class="note">The app isn't notarized by Apple yet, so macOS may warn about it the first time.
+            <a href="#wont-open">Here's how to open it</a>.</p>
         </article>
         <article class="install-card">
           <h3>Terminal</h3>
@@ -144,13 +145,90 @@
         Requires macOS 14 Sonoma or later. The download and Terminal options are for Apple silicon.</p>
     </section>
 
+    <section id="help" class="help">
+      <h2>Help</h2>
+
+      <h3 class="help-title" id="wont-open">If macOS won't open Relaunch</h3>
+      <p class="install-lede">macOS may say <em>“Apple could not verify ‘Relaunch’ is free of malware”</em>.
+        That's because this release isn't notarized by Apple yet, not because anything is wrong with it.
+        The source is <a href="https://github.com/STACK-42/relaunch">public</a>. Any one of these fixes it:</p>
+      <div class="install-grid">
+        <article class="install-card">
+          <h3>Open Anyway</h3>
+          <ol class="steps">
+            <li>Try to open Relaunch once, then click <strong>Done</strong> on the warning.</li>
+            <li>Open <strong>System Settings → Privacy &amp; Security</strong>.</li>
+            <li>Scroll down to <strong>Security</strong>, where it says Relaunch was blocked,
+              and click <strong>Open Anyway</strong>.</li>
+            <li>Confirm with your password or Touch ID, then click <strong>Open</strong>.</li>
+          </ol>
+          <p class="note">You only need to do this once.</p>
+        </article>
+        <article class="install-card">
+          <h3>Use the Terminal install instead</h3>
+          <p>Files downloaded by Terminal aren't marked as “from the internet”, so this install
+            doesn't trigger the warning. It still checks the download's checksum.</p>
+          <div class="command">
+            <code id="help-install-cmd">curl -fsSL https://relaunch.stack42.tech/install.sh | bash</code>
+            <button type="button" class="copy" data-copy="help-install-cmd" aria-label="Copy install command">Copy</button>
+          </div>
+        </article>
+        <article class="install-card">
+          <h3>Clear the download flag yourself</h3>
+          <p>If Relaunch is already in Applications, this removes the “downloaded from the internet” mark
+            macOS put on it:</p>
+          <div class="command">
+            <code id="xattr-cmd">xattr -dr com.apple.quarantine /Applications/Relaunch.app</code>
+            <button type="button" class="copy" data-copy="xattr-cmd" aria-label="Copy command">Copy</button>
+          </div>
+          <p class="note">Only do this for apps you trust.</p>
+        </article>
+      </div>
+
+      <h3 class="help-title" id="gesture">Bring back the pinch</h3>
+      <p class="install-lede">Launchpad opened when you pinched with your thumb and three fingers (or all five).
+        macOS now uses that pinch for its own Apps view and doesn't let other apps receive it.
+        You can still put it back:</p>
+      <div class="install-grid">
+        <article class="install-card">
+          <h3>1. Turn off the system gesture</h3>
+          <ol class="steps">
+            <li>Open <strong>System Settings → Trackpad → More Gestures</strong>.</li>
+            <li>Turn off <strong>Apps</strong> (“Pinch with thumb and three fingers”).</li>
+          </ol>
+          <p class="note">This stops macOS from opening its own Apps view when you pinch.</p>
+        </article>
+        <article class="install-card">
+          <h3>2. Point the pinch at Relaunch</h3>
+          <p>Use a gesture app such as <a href="https://folivora.ai">BetterTouchTool</a> (paid, with a free trial):</p>
+          <ol class="steps">
+            <li>Add a <strong>Trackpad</strong> trigger for a four- or five-finger <strong>pinch in</strong>.</li>
+            <li>Set its action to <strong>Open Application</strong> and choose <strong>Relaunch</strong>.</li>
+          </ol>
+          <p class="note">Opening Relaunch while it's already running closes it, so the same pinch
+            both opens and closes the grid, like Launchpad did.</p>
+        </article>
+        <article class="install-card">
+          <h3>Rather not install anything?</h3>
+          <p>Press <kbd>⌥</kbd><kbd>Space</kbd>, click Relaunch in your Dock, or use a hot corner:</p>
+          <div class="command">
+            <code id="corner-cmd">defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft</code>
+            <button type="button" class="copy" data-copy="corner-cmd" aria-label="Copy command">Copy</button>
+          </div>
+          <p class="note">Then quit and reopen Relaunch. Also accepts <code>topLeft</code>, <code>topRight</code>
+            and <code>bottomRight</code>.</p>
+        </article>
+      </div>
+    </section>
+
     <section id="faq" class="faq">
       <h2>Questions</h2>
       <details>
-        <summary>Can it open with the four-finger pinch or the F4 key?</summary>
-        <p>No. macOS's Dock captures both before any app sees them. Taking them over would need
-          private APIs, so Relaunch uses the Dock icon, a keyboard shortcut and an optional hot
-          corner instead.</p>
+        <summary>Can it open with the pinch gesture or the F4 key?</summary>
+        <p>Not by itself: macOS keeps both for its own Apps view. You can bring the pinch back with a
+          gesture app, though. See <a href="#gesture">Bring back the pinch</a>. The F4 key can't be
+          remapped without extra tools, so Relaunch uses <kbd>⌥</kbd><kbd>Space</kbd>, the Dock icon
+          and an optional hot corner.</p>
       </details>
       <details>
         <summary>How do I change the shortcut or the grid size?</summary>

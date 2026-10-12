@@ -209,7 +209,7 @@ h1 {
 
 /* Content sections */
 h2 { font-family: var(--display); font-size: clamp(28px, 4.5vw, 44px); letter-spacing: -0.015em; text-align: center; margin: 0 0 32px; }
-.features, .install, .faq { padding: 48px 0; }
+.features, .install, .help, .faq { padding: 48px 0; }
 .feature-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -301,6 +301,19 @@ h2 { font-family: var(--display); font-size: clamp(28px, 4.5vw, 44px); letter-sp
 }
 .copy:hover { border-color: var(--muted); }
 .center { text-align: center; margin-top: 24px; }
+
+.help-title {
+  text-align: center;
+  font-size: clamp(22px, 3vw, 28px);
+  letter-spacing: -0.01em;
+  margin: 40px 0 20px;
+  scroll-margin-top: 80px;
+}
+.help h2 + .help-title { margin-top: 0; }
+.help .install-lede { max-width: 640px; margin: 0 auto 24px; }
+.steps { margin: 0; padding-left: 1.2em; color: var(--muted); font-size: 15px; }
+.steps li { margin-bottom: 6px; }
+.steps strong { color: var(--text); font-weight: 600; }
 
 .faq { max-width: 720px; }
 .faq details {
