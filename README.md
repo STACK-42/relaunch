@@ -66,24 +66,30 @@ Releases aren't notarized by Apple yet, so a browser-downloaded copy may show
 - **Clear the flag** on a copy you already have:
   `xattr -dr com.apple.quarantine /Applications/Relaunch.app`
 
-## Bring back the pinch gesture
+## The pinch gesture
 
-macOS keeps the thumb-and-three-fingers pinch for its own Apps view, and apps
-can't receive it. To make it open Relaunch instead:
+Pinch with your thumb and three fingers to open Relaunch, and spread them to
+close it, like Launchpad. No extra apps or permissions are needed.
 
-1. System Settings → Trackpad → More Gestures → turn off **Apps**.
-2. In a gesture app such as [BetterTouchTool](https://folivora.ai), add a
-   Trackpad trigger for a four- or five-finger pinch in, with the action
-   **Open Application → Relaunch**. Opening Relaunch while it's running closes
-   it, so the same pinch toggles it.
+macOS uses the same pinch for its own Apps view, and the **Apps** switch in
+System Settings → Trackpad → More Gestures doesn't turn off on current macOS.
+So the first time you open Relaunch, it asks whether to turn off macOS's pinch
+for you. Say yes and the pinch opens only Relaunch. Apple's Apps view is still
+one ⌘Space away.
 
-Without extra apps: ⌥Space, the Dock icon, or a hot corner (see Settings).
+- Turning off macOS's pinch also turns off its spread to show the desktop.
+  Relaunch does that part itself: spread while Relaunch is closed and the
+  desktop shows.
+- Change your mind any time: right-click the Relaunch background and toggle
+  **Pinch Opens Only Relaunch**.
+- If System Settings was already open, it keeps showing the old state of the
+  **Apps** switch until you quit and reopen it.
 
 ## Using it
 
 | Action | How |
 | --- | --- |
-| Open / close | Dock icon, **⌥Space**, or a hot corner (see Settings) |
+| Open / close | Pinch / spread thumb and three fingers, Dock icon, **⌥Space**, or a hot corner (see Settings) |
 | Change page | Two-finger swipe, mouse wheel, ⌘← / ⌘→, or click a page dot |
 | Search | Just type. Matches prefixes, words, initials (`vsc`) and ignores accents |
 | Launch | Click, or arrow keys then Return |
@@ -93,7 +99,7 @@ Without extra apps: ⌥Space, the Dock icon, or a hot corner (see Settings).
 | Leave a folder | Drag the app out of the panel |
 | Edit mode (jiggle) | Hold ⌥ |
 | Close | Esc, click empty space, ⌘W |
-| More | Right-click the background: Open at Login, Restore Launchpad Layout, Reset, Quit |
+| More | Right-click the background: Open at Login, Pinch Opens Only Relaunch, Restore Launchpad Layout, Reset, Quit |
 
 ## Settings
 
@@ -102,6 +108,8 @@ defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"   # "" disables it
 defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft  # topLeft|topRight|bottomLeft|bottomRight
 defaults write com.ahmedalghali.Relaunch columns -int 8        # default 7
 defaults write com.ahmedalghali.Relaunch rows -int 6           # default 5
+defaults write com.ahmedalghali.Relaunch pinch -bool false     # stop watching the trackpad pinch
+defaults write com.ahmedalghali.Relaunch openAtLogin -bool false
 ```
 
 Restart Relaunch after changing settings. The layout is stored in
@@ -120,8 +128,9 @@ Measured on an Apple-silicon MacBook running macOS 27.0, with 115 apps:
   swipe re-renders only the view that applies the translation, not the grid.
   Dragging works the same way: cursor motion redraws only the floating icon.
 - **Idle:** 0 % CPU, about 100–145 MB resident, 0.9 MB binary.
-- **No permissions:** the hotkey uses Carbon `RegisterEventHotKey`, and hot
-  corners use mouse-move monitors, so Accessibility access isn't needed.
+- **No permissions:** the hotkey uses Carbon `RegisterEventHotKey`, hot
+  corners use mouse-move monitors, and the pinch reads raw trackpad touches
+  from MultitouchSupport, so Accessibility access isn't needed.
 
 ## How it differs from Launchpad
 
@@ -132,8 +141,8 @@ Measured on an Apple-silicon MacBook running macOS 27.0, with 115 apps:
 - Liquid Glass on macOS 26+, materials on 14–15.
 - Install and uninstall are detected live.
 
-**Limitation:** the four-finger pinch and the F4 key stay with the system,
-because both are captured by the Dock (see the research notes).
+**Limitation:** the F4 key stays with the system, because the Dock captures
+it (see the research notes). The pinch works once macOS's own pinch is off.
 
 ## License
 

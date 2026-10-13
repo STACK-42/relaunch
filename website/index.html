@@ -186,30 +186,28 @@
       </div>
 
       <h3 class="help-title" id="gesture">Bring back the pinch</h3>
-      <p class="install-lede">Launchpad opened when you pinched with your thumb and three fingers (or all five).
-        macOS now uses that pinch for its own Apps view and doesn't let other apps receive it.
-        You can still put it back:</p>
+      <p class="install-lede">Pinch with your thumb and three fingers to open Relaunch, and spread them to
+        close it, just like Launchpad. No extra apps or permissions needed.</p>
       <div class="install-grid">
         <article class="install-card">
-          <h3>1. Turn off the system gesture</h3>
-          <ol class="steps">
-            <li>Open <strong>System Settings → Trackpad → More Gestures</strong>.</li>
-            <li>Turn off <strong>Apps</strong> (“Pinch with thumb and three fingers”).</li>
-          </ol>
-          <p class="note">This stops macOS from opening its own Apps view when you pinch.</p>
+          <h3>1. Say yes once</h3>
+          <p>macOS uses the same pinch for its own Apps view, and its <strong>Apps</strong> switch in
+            Trackpad settings doesn't turn off. The first time you open Relaunch, it offers to turn off
+            macOS's pinch for you.</p>
+          <p class="note">Apple's Apps view is still one <kbd>⌘</kbd><kbd>Space</kbd> away.</p>
         </article>
         <article class="install-card">
-          <h3>2. Point the pinch at Relaunch</h3>
-          <p>Use a gesture app such as <a href="https://folivora.ai">BetterTouchTool</a> (paid, with a free trial):</p>
+          <h3>2. Pinch</h3>
           <ol class="steps">
-            <li>Add a <strong>Trackpad</strong> trigger for a four- or five-finger <strong>pinch in</strong>.</li>
-            <li>Set its action to <strong>Open Application</strong> and choose <strong>Relaunch</strong>.</li>
+            <li><strong>Pinch in</strong> to open Relaunch.</li>
+            <li><strong>Spread</strong> to close it.</li>
+            <li><strong>Spread</strong> while it's closed to show the desktop, as before.</li>
           </ol>
-          <p class="note">Opening Relaunch while it's already running closes it, so the same pinch
-            both opens and closes the grid, like Launchpad did.</p>
+          <p class="note">Changed your mind? Right-click the Relaunch background and toggle
+            <strong>Pinch Opens Only Relaunch</strong>.</p>
         </article>
         <article class="install-card">
-          <h3>Rather not install anything?</h3>
+          <h3>No trackpad?</h3>
           <p>Press <kbd>⌥</kbd><kbd>Space</kbd>, click Relaunch in your Dock, or use a hot corner:</p>
           <div class="command">
             <code id="corner-cmd">defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft</code>
@@ -225,10 +223,9 @@
       <h2>Questions</h2>
       <details>
         <summary>Can it open with the pinch gesture or the F4 key?</summary>
-        <p>Not by itself: macOS keeps both for its own Apps view. You can bring the pinch back with a
-          gesture app, though. See <a href="#gesture">Bring back the pinch</a>. The F4 key can't be
-          remapped without extra tools, so Relaunch uses <kbd>⌥</kbd><kbd>Space</kbd>, the Dock icon
-          and an optional hot corner.</p>
+        <p>The pinch, yes: see <a href="#gesture">Bring back the pinch</a>. The F4 key stays with
+          macOS's Apps view and can't be remapped without extra tools, so Relaunch also offers
+          <kbd>⌥</kbd><kbd>Space</kbd>, the Dock icon and an optional hot corner.</p>
       </details>
       <details>
         <summary>How do I change the shortcut or the grid size?</summary>

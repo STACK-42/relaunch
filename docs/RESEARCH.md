@@ -94,16 +94,37 @@ there are two folders, "Other" (29 apps) and "Games".
 | Bundle id as the app identity | Bundle id (falls back to the path) |
 | Pre-rendered icon cache | Icons rendered to bitmaps once, concurrently, at launch |
 | Overflow cascades to the next page | `Layout.normalize` does the same |
-| Toggled by Dock tile, F4 key, pinch gesture | Dock tile (reopen event), global hotkey, optional hot corner |
+| Toggled by Dock tile, F4 key, pinch gesture | Dock tile (reopen event), global hotkey, optional hot corner, pinch gesture |
 
 Because the old database is still on disk, Relaunch **imports it on first
 run** (`LegacyLaunchpad.swift`). Your own pages and folders come back. The
 file is opened with SQLite's `immutable=1`, so Apple's file is never written.
 
+## The pinch, through private API
+
+- **Four-finger pinch.** The Dock consumes the gesture before any app sees it
+  as an event, so Relaunch reads raw touches from the private
+  `MultitouchSupport` framework instead (`Pinch.swift`), loaded with `dlopen`
+  so a missing symbol only disables the pinch. Four or more touches
+  converging opens Relaunch; spreading closes it. No permission is needed.
+- **Taking the gesture from macOS.** The **Apps** switch in Trackpad settings
+  writes nothing on macOS 27.0: turning it off changes no preference. The
+  setting underneath it does work, so Relaunch offers to set
+  `TrackpadFourFingerPinchGesture` and `TrackpadFiveFingerPinchGesture` to 0
+  (in `com.apple.AppleMultitouchTrackpad`, the Bluetooth trackpad domain and
+  the current-host globals) and applies them with
+  `SystemAdministration.framework/Resources/activateSettings -u`, as System
+  Settings does. An open Trackpad pane keeps showing the old state until it is
+  reopened.
+- **Driver resets.** Applying trackpad settings (and waking from sleep) resets
+  the device. The old `MTDevice` subscription then goes silent while
+  `MTDeviceIsRunning` still reports true, so Relaunch re-subscribes after
+  applying settings, on wake, on IOKit device changes, and whenever the cursor
+  moves without touch frames arriving.
+- **Show Desktop.** Turning off the pinch also turns off the spread. Relaunch
+  replaces it with `CoreDockSendNotification("com.apple.showdesktop.awake")`.
+
 ## Not reproducible without private API
 
-- **Four-finger pinch.** The Dock consumes the gesture before any app sees it.
-  Taking it over would mean private Dock/SkyLight interfaces or disabling the
-  system gesture, so Relaunch uses a hotkey and the Dock tile instead.
 - **The F4 / Launchpad key.** The Dock handles it as a system-defined event.
   Intercepting it would need an event tap and the Accessibility permission.
