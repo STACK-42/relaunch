@@ -185,14 +185,36 @@ private enum Aerials {
     }
 }
 
+/// Opens at login by default, like Launchpad was always there. The choice is
+/// kept in our own defaults so it can be re-applied: ad-hoc builds get a new
+/// signature on every build, which silently invalidates the registration.
 enum LoginItem {
+    private static let key = "openAtLogin"
+
     static var isEnabled: Bool { SMAppService.mainApp.status == .enabled }
 
     static func set(_ on: Bool) {
+        UserDefaults.standard.set(on, forKey: key)
+        apply(on, beepOnError: true)
+    }
+
+    /// Called at launch. Only an installed copy registers, so a run from
+    /// build/ never points the login item at a temporary path.
+    static func sync() {
+        let wanted = UserDefaults.standard.object(forKey: key) as? Bool ?? true
+        guard wanted, Bundle.main.bundlePath.hasPrefix("/Applications/") else { return }
+        apply(true, beepOnError: false)
+    }
+
+    private static func apply(_ on: Bool, beepOnError: Bool) {
         do {
-            if on { try SMAppService.mainApp.register() } else { try SMAppService.mainApp.unregister() }
+            if on {
+                if SMAppService.mainApp.status != .enabled { try SMAppService.mainApp.register() }
+            } else {
+                try SMAppService.mainApp.unregister()
+            }
         } catch {
-            NSSound.beep()
+            if beepOnError { NSSound.beep() }
             NSLog("Relaunch: login item change failed: \(error.localizedDescription)")
         }
     }

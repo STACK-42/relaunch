@@ -54,9 +54,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             NSApp.hide(nil) // hands focus back to the previous app
         }
 
+        LoginItem.sync()
         installMonitors()
         installHotKey()
         installHotCorner()
+        installPinch()
         watchApplicationFolders()
         watchWallpaper()
 
@@ -168,6 +170,19 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         guard !spec.isEmpty else { return }
         hotKey = HotKey(spec: spec) { [weak self] in self?.toggle() }
         if hotKey == nil { NSLog("Relaunch: could not register hotkey '\(spec)'") }
+    }
+
+    /// Pinch in opens, spread out closes, like Launchpad's gesture.
+    private func installPinch() {
+        guard PinchGesture.enabled else { return }
+        PinchGesture.start { [weak self] kind in
+            guard let self else { return }
+            debugLog("pinch: \(kind)")
+            switch kind {
+            case .pinchIn: if !self.isShown { self.show() }
+            case .spreadOut: if self.isShown { self.model.hide() }
+            }
+        }
     }
 
     /// Optional: `defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft`
