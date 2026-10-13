@@ -98,6 +98,11 @@ struct BackgroundMenu: View {
         Button("Reset to Default Layout") { model.resetLayout() }
         Divider()
         Button("Quit Relaunch") { NSApp.terminate(nil) }
+        Button("Uninstall Relaunch…") {
+            // Out of the way first: the alert would sit under the full-screen grid.
+            model.hide()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { Uninstaller.confirmAndRun() }
+        }
     }
 }
 

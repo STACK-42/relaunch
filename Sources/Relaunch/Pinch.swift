@@ -230,12 +230,26 @@ enum SystemPinch {
     private static let hostKeys = ["com.apple.trackpad.fourFingerPinchSwipeGesture",
                                    "com.apple.trackpad.fiveFingerPinchSwipeGesture"]
 
+    private static let turnedOffKey = "turnedOffSystemPinch"
+
     static var isEnabled: Bool {
         let v = CFPreferencesCopyAppValue(keys[0] as CFString, domains[0] as CFString) as? Int
         return (v ?? 2) != 0
     }
 
-    static func set(_ on: Bool) {
+    /// Whether macOS's pinch is off because Relaunch turned it off, so an
+    /// uninstall only restores what Relaunch changed. Copies from before this
+    /// was recorded only offered while the pinch was on, so having asked and
+    /// finding it off means Relaunch did it.
+    static var relaunchTurnedItOff: Bool {
+        guard !isEnabled else { return false }
+        return UserDefaults.standard.object(forKey: turnedOffKey) as? Bool
+            ?? UserDefaults.standard.bool(forKey: "askedSystemPinch")
+    }
+
+    /// `wait` blocks until the trackpad has the new setting (used when quitting).
+    static func set(_ on: Bool, wait: Bool = false) {
+        UserDefaults.standard.set(!on, forKey: turnedOffKey)
         let value = (on ? 2 : 0) as CFNumber
         for domain in domains {
             for key in keys { CFPreferencesSetAppValue(key as CFString, value, domain as CFString) }
@@ -253,7 +267,12 @@ enum SystemPinch {
             "/System/Library/PrivateFrameworks/SystemAdministration.framework/Resources/activateSettings")
         task.arguments = ["-u"]
         task.terminationHandler = { _ in DispatchQueue.main.async { PinchGesture.reconnect(after: 1) } }
-        do { try task.run() } catch { NSLog("Relaunch: could not apply trackpad settings: \(error)") }
+        do {
+            try task.run()
+            if wait { task.waitUntilExit() }
+        } catch {
+            NSLog("Relaunch: could not apply trackpad settings: \(error)")
+        }
         debugLog("system pinch -> \(on)")
     }
 
@@ -283,6 +302,10 @@ enum SystemPinch {
         alert.addButton(withTitle: "Use Pinch for Relaunch")
         alert.addButton(withTitle: "Not Now")
         NSApp.activate()
-        if alert.runModal() == .alertFirstButtonReturn { set(false) }
+        if alert.runModal() == .alertFirstButtonReturn {
+            set(false)
+        } else {
+            UserDefaults.standard.set(false, forKey: turnedOffKey)
+        }
     }
 }

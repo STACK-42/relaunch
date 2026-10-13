@@ -85,6 +85,29 @@ one ⌘Space away.
 - If System Settings was already open, it keeps showing the old state of the
   **Apps** switch until you quit and reopen it.
 
+## Update or uninstall
+
+Relaunch runs in the background, so it has no Quit in the Dock or menu bar.
+Everything is in the menu you get by right-clicking the Relaunch background.
+
+**Update:** right-click the background → **Quit Relaunch**, then drag the new
+version into Applications and replace the old one. Your layout and settings
+stay. The Terminal install command does all of this for you.
+
+**Uninstall:** right-click the background → **Uninstall Relaunch…**. It turns
+macOS's own pinch back on (if Relaunch turned it off), removes the login item,
+the layout and the settings, and moves the app to the Trash. From Terminal:
+
+```sh
+curl -fsSL https://relaunch.stack42.tech/install.sh | bash -s -- --uninstall
+```
+
+Installing again later starts fresh, like the first time, and can bring back
+your Launchpad layout again.
+
+**Already deleted it by hand?** Turn macOS's pinch back on in System Settings →
+Trackpad → More Gestures → **Apps**, and remove Relaunch from your Dock.
+
 ## Using it
 
 | Action | How |
@@ -99,7 +122,7 @@ one ⌘Space away.
 | Leave a folder | Drag the app out of the panel |
 | Edit mode (jiggle) | Hold ⌥ |
 | Close | Esc, click empty space, ⌘W |
-| More | Right-click the background: Open at Login, Pinch Opens Only Relaunch, Restore Launchpad Layout, Reset, Quit |
+| More | Right-click the background: Open at Login, Pinch Opens Only Relaunch, Restore Launchpad Layout, Reset, Quit, Uninstall |
 
 ## Settings
 

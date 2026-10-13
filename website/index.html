@@ -217,6 +217,40 @@
             and <code>bottomRight</code>.</p>
         </article>
       </div>
+
+      <h3 class="help-title" id="update-uninstall">Update or uninstall</h3>
+      <p class="install-lede">Relaunch runs in the background, so it has no Quit in the Dock or menu bar.
+        Everything is in the menu you get by right-clicking the Relaunch background.</p>
+      <div class="install-grid">
+        <article class="install-card">
+          <h3>Update</h3>
+          <ol class="steps">
+            <li>Right-click the Relaunch background and choose <strong>Quit Relaunch</strong>.</li>
+            <li>Drag the new Relaunch into Applications and replace the old one.</li>
+          </ol>
+          <p class="note">Your layout and settings stay. Or rerun the Terminal install, which does both:</p>
+          <div class="command">
+            <code id="update-cmd">curl -fsSL https://relaunch.stack42.tech/install.sh | bash</code>
+            <button type="button" class="copy" data-copy="update-cmd" aria-label="Copy update command">Copy</button>
+          </div>
+        </article>
+        <article class="install-card">
+          <h3>Uninstall</h3>
+          <p>Right-click the Relaunch background and choose <strong>Uninstall Relaunch…</strong>. It turns
+            macOS's own pinch back on, removes the login item, your layout and settings, and moves the app
+            to the Trash. From Terminal:</p>
+          <div class="command">
+            <code id="uninstall-cmd">curl -fsSL https://relaunch.stack42.tech/install.sh | bash -s -- --uninstall</code>
+            <button type="button" class="copy" data-copy="uninstall-cmd" aria-label="Copy uninstall command">Copy</button>
+          </div>
+          <p class="note">Installing again later starts fresh and can bring back your Launchpad layout again.</p>
+        </article>
+        <article class="install-card">
+          <h3>Already deleted it?</h3>
+          <p>Turn macOS's pinch back on in <strong>System Settings → Trackpad → More Gestures →
+            Apps</strong>, and remove Relaunch from your Dock.</p>
+        </article>
+      </div>
     </section>
 
     <section id="faq" class="faq">

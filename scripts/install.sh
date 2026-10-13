@@ -69,6 +69,14 @@ install() {
 
 uninstall() {
   say "Removing Relaunch…"
+  # Newer versions uninstall themselves: they also turn macOS's own pinch back
+  # on and remove the login item. Older ones only need the files removed.
+  for app in /Applications/Relaunch.app "$HOME/Applications/Relaunch.app"; do
+    bin="$app/Contents/MacOS/Relaunch"
+    if [ -x "$bin" ] && [ "$(defaults read "$app/Contents/Info" RelaunchSelfUninstall 2>/dev/null)" = 1 ]; then
+      "$bin" --uninstall || true
+    fi
+  done
   pkill -x Relaunch 2>/dev/null || true
   rm -rf /Applications/Relaunch.app "$HOME/Applications/Relaunch.app"
   rm -rf "$HOME/Library/Application Support/Relaunch"

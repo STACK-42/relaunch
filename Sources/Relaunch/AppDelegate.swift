@@ -40,6 +40,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var isShown: Bool { window.isVisible && !model.isHiding }
 
     func applicationDidFinishLaunching(_ notification: Notification) {
+        if CommandLine.arguments.contains("--uninstall") { return Uninstaller.run() }
         let launchedAtLogin = Self.launchedAsLoginItem || CommandLine.arguments.contains("--background")
         NSApp.mainMenu = Self.makeMenu()
 
