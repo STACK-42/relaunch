@@ -86,7 +86,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             Wallpaper.prewarm()
         }
 
-        if !launchedAtLogin { show() }
+        if !launchedAtLogin {
+            if PinchGesture.enabled { SystemPinch.offerTakeover() }
+            show()
+        }
     }
 
     /// Clicking the Dock icon (or opening the app again) toggles, exactly like
@@ -180,7 +183,10 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             debugLog("pinch: \(kind)")
             switch kind {
             case .pinchIn: if !self.isShown { self.show() }
-            case .spreadOut: if self.isShown { self.model.hide() }
+            case .spreadOut:
+                if self.isShown { self.model.hide() }
+                // macOS's spread is off along with its pinch; stand in for it.
+                else if !SystemPinch.isEnabled { SystemPinch.showDesktop() }
             }
         }
     }

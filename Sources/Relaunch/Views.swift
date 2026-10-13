@@ -87,6 +87,10 @@ struct BackgroundMenu: View {
 
     var body: some View {
         Toggle("Open at Login", isOn: Binding(get: { LoginItem.isEnabled }, set: { LoginItem.set($0) }))
+        if PinchGesture.enabled {
+            Toggle("Pinch Opens Only Relaunch",
+                   isOn: Binding(get: { !SystemPinch.isEnabled }, set: { SystemPinch.set(!$0) }))
+        }
         Divider()
         if LegacyLaunchpad.databaseURL != nil {
             Button("Restore Launchpad Layout") { model.importLegacyLayout() }
