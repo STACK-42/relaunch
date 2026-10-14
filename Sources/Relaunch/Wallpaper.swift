@@ -2,6 +2,7 @@ import AppKit
 import AVFoundation
 import CoreImage
 import ImageIO
+import Security
 import ServiceManagement
 
 /// Launchpad showed a heavily blurred desktop picture rather than the windows
@@ -198,12 +199,40 @@ enum LoginItem {
         apply(on, beepOnError: true)
     }
 
+    private static let signatureKey = "loginItemSignature"
+
     /// Called at launch. Only an installed copy registers, so a run from
     /// build/ never points the login item at a temporary path.
+    ///
+    /// macOS ties the login item to the app's code signature. An ad-hoc
+    /// signature changes with every build, so after an update the item still
+    /// reports `.enabled` but no longer launches anything. Register again
+    /// whenever the signature differs from the one registered.
     static func sync() {
         let wanted = UserDefaults.standard.object(forKey: key) as? Bool ?? true
         guard wanted, Bundle.main.bundlePath.hasPrefix("/Applications/") else { return }
+        let signature = currentSignature()
+        if let signature, signature != UserDefaults.standard.string(forKey: signatureKey),
+           SMAppService.mainApp.status == .enabled {
+            debugLog("login item: signature changed, registering again")
+            try? SMAppService.mainApp.unregister()
+        }
         apply(true, beepOnError: false)
+        if SMAppService.mainApp.status == .enabled, let signature {
+            UserDefaults.standard.set(signature, forKey: signatureKey)
+        }
+    }
+
+    /// The running app's code directory hash, which changes with every build.
+    private static func currentSignature() -> String? {
+        var code: SecCode?
+        var staticCode: SecStaticCode?
+        var info: CFDictionary?
+        guard SecCodeCopySelf([], &code) == errSecSuccess, let code,
+              SecCodeCopyStaticCode(code, [], &staticCode) == errSecSuccess, let staticCode,
+              SecCodeCopySigningInformation(staticCode, [], &info) == errSecSuccess,
+              let hash = (info as? [String: Any])?[kSecCodeInfoUnique as String] as? Data else { return nil }
+        return hash.map { String(format: "%02x", $0) }.joined()
     }
 
     private static func apply(_ on: Bool, beepOnError: Bool) {
