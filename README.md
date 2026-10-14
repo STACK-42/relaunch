@@ -112,7 +112,7 @@ Trackpad → More Gestures → **Apps**, and remove Relaunch from your Dock.
 
 | Action | How |
 | --- | --- |
-| Open / close | Pinch / spread thumb and three fingers, Dock icon, **⌥Space**, or a hot corner (see Settings) |
+| Open / close | Pinch / spread thumb and three fingers, Dock icon, or a hot corner (see Settings) |
 | Change page | Two-finger swipe, mouse wheel, ⌘← / ⌘→, or click a page dot |
 | Search | Just type. Matches prefixes, words, initials (`vsc`) and ignores accents |
 | Launch | Click, or arrow keys then Return |
@@ -127,7 +127,7 @@ Trackpad → More Gestures → **Apps**, and remove Relaunch from your Dock.
 ## Settings
 
 ```sh
-defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"   # "" disables it
+defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"   # optional shortcut; none by default
 defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft  # topLeft|topRight|bottomLeft|bottomRight
 defaults write com.ahmedalghali.Relaunch columns -int 8        # default 7
 defaults write com.ahmedalghali.Relaunch rows -int 6           # default 5
@@ -151,7 +151,7 @@ Measured on an Apple-silicon MacBook running macOS 27.0, with 115 apps:
   swipe re-renders only the view that applies the translation, not the grid.
   Dragging works the same way: cursor motion redraws only the floating icon.
 - **Idle:** 0 % CPU, about 100–145 MB resident, 0.9 MB binary.
-- **No permissions:** the hotkey uses Carbon `RegisterEventHotKey`, hot
+- **No permissions:** the optional shortcut uses Carbon `RegisterEventHotKey`, hot
   corners use mouse-move monitors, and the pinch reads raw trackpad touches
   from MultitouchSupport, so Accessibility access isn't needed.
 

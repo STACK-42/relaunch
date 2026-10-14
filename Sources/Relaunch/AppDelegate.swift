@@ -171,11 +171,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         } as Any)
     }
 
-    /// Default ⌥Space; override with
-    /// `defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"` (or "" to disable).
+    /// None by default: Launchpad had none, and ⌥Space belongs to apps such as
+    /// Claude and ChatGPT. Opt in with
+    /// `defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"`.
     private func installHotKey() {
-        let spec = UserDefaults.standard.string(forKey: "hotkey") ?? "option+space"
-        guard !spec.isEmpty else { return }
+        guard let spec = UserDefaults.standard.string(forKey: "hotkey"), !spec.isEmpty else { return }
         hotKey = HotKey(spec: spec) { [weak self] in self?.toggle() }
         if hotKey == nil { NSLog("Relaunch: could not register hotkey '\(spec)'") }
     }

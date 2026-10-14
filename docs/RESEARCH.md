@@ -94,7 +94,7 @@ there are two folders, "Other" (29 apps) and "Games".
 | Bundle id as the app identity | Bundle id (falls back to the path) |
 | Pre-rendered icon cache | Icons rendered to bitmaps once, concurrently, at launch |
 | Overflow cascades to the next page | `Layout.normalize` does the same |
-| Toggled by Dock tile, F4 key, pinch gesture | Dock tile (reopen event), global hotkey, optional hot corner, pinch gesture |
+| Toggled by Dock tile, F4 key, pinch gesture | Dock tile (reopen event), pinch gesture, optional hot corner or shortcut |
 
 Because the old database is still on disk, Relaunch **imports it on first
 run** (`LegacyLaunchpad.swift`). Your own pages and folders come back. The

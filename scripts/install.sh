@@ -64,7 +64,7 @@ install() {
   say "Installed $dest/Relaunch.app"
 
   open "$dest/Relaunch.app"
-  say "Done. Press ⌥Space, or drag Relaunch from $dest into your Dock and click it."
+  say "Done. Pinch with your thumb and three fingers, or drag Relaunch from $dest into your Dock and click it."
 }
 
 uninstall() {

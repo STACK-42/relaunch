@@ -103,8 +103,8 @@
         <article>
           <span class="glyph" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg></span>
           <h3>No permissions</h3>
-          <p>Open it from the Dock, with <kbd>⌥</kbd><kbd>Space</kbd>, or from a hot corner.
-            No Accessibility access, no private APIs, no tracking.</p>
+          <p>Open it with the pinch, from the Dock, or from a hot corner.
+            No Accessibility access, no tracking.</p>
         </article>
       </div>
     </section>
@@ -141,7 +141,7 @@
           <p class="note">No Command Line Tools yet? Run <code>xcode-select --install</code> first.</p>
         </article>
       </div>
-      <p class="fine center">Then drag Relaunch into your Dock, or press <kbd>⌥</kbd><kbd>Space</kbd>.
+      <p class="fine center">Then pinch with your thumb and three fingers, or drag Relaunch into your Dock.
         Requires macOS 14 Sonoma or later. The download and Terminal options are for Apple silicon.</p>
     </section>
 
@@ -208,7 +208,7 @@
         </article>
         <article class="install-card">
           <h3>No trackpad?</h3>
-          <p>Press <kbd>⌥</kbd><kbd>Space</kbd>, click Relaunch in your Dock, or use a hot corner:</p>
+          <p>Click Relaunch in your Dock, or use a hot corner:</p>
           <div class="command">
             <code id="corner-cmd">defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft</code>
             <button type="button" class="copy" data-copy="corner-cmd" aria-label="Copy command">Copy</button>
@@ -259,11 +259,12 @@
         <summary>Can it open with the pinch gesture or the F4 key?</summary>
         <p>The pinch, yes: see <a href="#gesture">Bring back the pinch</a>. The F4 key stays with
           macOS's Apps view and can't be remapped without extra tools, so Relaunch also offers
-          <kbd>⌥</kbd><kbd>Space</kbd>, the Dock icon and an optional hot corner.</p>
+          the Dock icon and an optional hot corner.</p>
       </details>
       <details>
-        <summary>How do I change the shortcut or the grid size?</summary>
-        <p>With <code>defaults</code>, then restart Relaunch:</p>
+        <summary>Can I add a keyboard shortcut or change the grid size?</summary>
+        <p>Relaunch has no keyboard shortcut by default. Add one, or change the grid, with
+          <code>defaults</code>, then restart Relaunch:</p>
         <pre><code>defaults write com.ahmedalghali.Relaunch hotkey "ctrl+opt+l"
 defaults write com.ahmedalghali.Relaunch columns -int 8
 defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft</code></pre>
