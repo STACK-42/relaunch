@@ -137,8 +137,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         NSApp.unhide(nil)
-        if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
+        // Order the grid in before activating: activation jumps to a Space
+        // holding one of the app's windows, and until the grid (on every Space)
+        // is up, the only candidate is a text-input helper window on whichever
+        // Space Relaunch launched on.
         window.makeKeyAndOrderFront(nil)
+        if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
         debugLog("show on \(screen.frame) visible=\(window.isVisible) key=\(window.isKeyWindow) active=\(NSApp.isActive)")
     }
 
