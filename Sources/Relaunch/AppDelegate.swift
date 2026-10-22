@@ -137,10 +137,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
 
         NSApp.unhide(nil)
-        // Order the grid in before activating: activation jumps to a Space
-        // holding one of the app's windows, and until the grid (on every Space)
-        // is up, the only candidate is a text-input helper window on whichever
-        // Space Relaunch launched on.
+        // Activation jumps to a Space holding one of the app's windows. The
+        // grid is on every Space, but AppKit's text-input helpers for the
+        // search field (TUINSWindow, SPRoundedWindow) stay on the Space they
+        // were created on, and the grid isn't always registered on this Space
+        // by the time activation looks. Put the helpers on every Space too, so
+        // there is nowhere else to jump to.
+        for w in NSApp.windows where w !== window {
+            w.collectionBehavior.insert(.canJoinAllSpaces)
+        }
         window.makeKeyAndOrderFront(nil)
         if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
         debugLog("show on \(screen.frame) visible=\(window.isVisible) key=\(window.isKeyWindow) active=\(NSApp.isActive)")
