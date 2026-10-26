@@ -10,6 +10,10 @@ import ServiceManagement
 /// at 800 px a 18 px sigma reads like a ~60 px blur on a full-size image.
 enum Wallpaper {
     private static var cache: [String: NSImage] = [:]
+    /// Which wallpaper each screen shows. Reading the store takes ~15 ms, too
+    /// slow to repeat on every open; `prewarm` refreshes it whenever the
+    /// wallpaper, the Space or the displays change.
+    private static var sources: [NSNumber: Source?] = [:]
     private static let context = CIContext()
 
     enum Source {
@@ -22,7 +26,7 @@ enum Wallpaper {
     }
 
     static func blurred(for screen: NSScreen, completion: @escaping (NSImage?) -> Void) {
-        guard let source = current(for: screen) else { completion(nil); return }
+        guard let source = source(for: screen) else { completion(nil); return }
         let key = source.url.path
         if let hit = cache[key] { completion(hit); return }
         frame(of: source) { cg in
@@ -38,12 +42,23 @@ enum Wallpaper {
     /// on rendering: swapping the background in mid-animation is what made the
     /// first open flash from a soft blur to a dark, saturated one.
     static func cached(for screen: NSScreen) -> NSImage? {
-        current(for: screen).flatMap { cache[$0.url.path] }
+        source(for: screen).flatMap { cache[$0.url.path] }
     }
 
     /// Renders ahead of time, so the next open finds it in `cached(for:)`.
     static func prewarm() {
+        sources.removeAll()
         for screen in NSScreen.screens { blurred(for: screen) { _ in } }
+    }
+
+    private static func source(for screen: NSScreen) -> Source? {
+        guard let id = screen.deviceDescription[NSDeviceDescriptionKey("NSScreenNumber")] as? NSNumber else {
+            return current(for: screen)
+        }
+        if let known = sources[id] { return known }
+        let found = current(for: screen)
+        sources[id] = found
+        return found
     }
 
     /// `desktopImageURL` only knows classic still pictures. Since macOS 14 the
