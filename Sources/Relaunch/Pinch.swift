@@ -10,10 +10,19 @@ import IOKit
 /// or its layout changes, the pinch simply does nothing.
 ///
 /// Turn off with `defaults write com.ahmedalghali.Relaunch pinch -bool false`.
+/// How far the fingers must move is `pinchDistance` (see `distance`).
 final class PinchGesture {
     enum Kind { case pinchIn, spreadOut }
 
     static var enabled: Bool { UserDefaults.standard.object(forKey: "pinch") as? Bool ?? true }
+
+    /// The share of their spread the fingers must close by to open, 0.25 by
+    /// default. Spreading back out by the same ratio closes. Lower is more
+    /// sensitive: `defaults write com.ahmedalghali.Relaunch pinchDistance -float 0.2`
+    private static let distance: Float = {
+        let v = UserDefaults.standard.float(forKey: "pinchDistance")
+        return v > 0 ? min(max(v, 0.1), 0.6) : 0.25
+    }()
 
     private typealias DeviceCreateList = @convention(c) () -> Unmanaged<CFArray>
     private typealias ContactCallback = @convention(c) (
@@ -213,8 +222,8 @@ final class PinchGesture {
         minSpread = min(minSpread, spread)
         maxSpread = max(maxSpread, spread)
         guard !fired, minSpread > 0.01 else { return }
-        let kind: Kind? = spread < maxSpread * 0.6 ? .pinchIn
-            : spread > minSpread * 1.5 ? .spreadOut : nil
+        let kind: Kind? = spread < maxSpread * (1 - distance) ? .pinchIn
+            : spread > minSpread / (1 - distance) ? .spreadOut : nil
         guard let kind else { return }
         fired = true
         let firedAt = CFAbsoluteTimeGetCurrent(), held = Int((firedAt - touchStart) * 1000)

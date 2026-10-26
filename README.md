@@ -142,6 +142,7 @@ defaults write com.ahmedalghali.Relaunch hotCorner bottomLeft  # topLeft|topRigh
 defaults write com.ahmedalghali.Relaunch columns -int 8        # default 7
 defaults write com.ahmedalghali.Relaunch rows -int 6           # default 5
 defaults write com.ahmedalghali.Relaunch pinch -bool false     # stop watching the trackpad pinch
+defaults write com.ahmedalghali.Relaunch pinchDistance -float 0.2  # how far to pinch; default 0.25, lower is easier
 defaults write com.ahmedalghali.Relaunch openAtLogin -bool false
 ```
 
