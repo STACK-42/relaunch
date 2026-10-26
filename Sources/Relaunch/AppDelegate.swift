@@ -36,6 +36,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var watchers: [DispatchSourceFileSystemObject] = []
     private var rescanWork: DispatchWorkItem?
     private var cornerArmed = true
+    private var activity: NSObjectProtocol?
 
     private var isShown: Bool { window.isVisible && !model.isHiding }
 
@@ -44,6 +45,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let launchedAtLogin = Self.launchedAsLoginItem || CommandLine.arguments.contains("--background")
             || Updater.consumeRelaunchFlag()
         NSApp.mainMenu = Self.makeMenu()
+        // Relaunch spends nearly all its time hidden, which is exactly when
+        // App Nap throttles an app. A napping Relaunch handled the pinch
+        // seconds late. It idles at 0% CPU, so staying awake costs nothing.
+        activity = ProcessInfo.processInfo.beginActivity(
+            options: .userInitiatedAllowingIdleSystemSleep, reason: "Opens instantly on the pinch")
 
         let t0 = CFAbsoluteTimeGetCurrent()
         model.bootstrap()
