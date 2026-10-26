@@ -53,6 +53,7 @@ final class PinchGesture {
     private static var maxSpread: Float = 0
     private static var fired = false
     private static var sawFrame = false
+    private static var touchStart: CFAbsoluteTime = 0
 
     /// Starts listening. Returns false when the framework isn't available.
     @discardableResult
@@ -190,6 +191,7 @@ final class PinchGesture {
             DispatchQueue.main.async { debugLog("pinch: receiving touches") }
         }
         guard count >= 4, let data else {
+            touchStart = 0
             minSpread = 0
             maxSpread = 0
             fired = false
@@ -206,6 +208,7 @@ final class PinchGesture {
         for i in 0..<count { spread += hypotf(xs[i] - cx, ys[i] - cy) }
         spread /= Float(count)
 
+        if touchStart == 0 { touchStart = lastFrame }
         if maxSpread == 0 { minSpread = spread; maxSpread = spread; return }
         minSpread = min(minSpread, spread)
         maxSpread = max(maxSpread, spread)
@@ -214,7 +217,11 @@ final class PinchGesture {
             : spread > minSpread * 1.5 ? .spreadOut : nil
         guard let kind else { return }
         fired = true
-        DispatchQueue.main.async { handler?(kind) }
+        let firedAt = CFAbsoluteTimeGetCurrent(), held = Int((firedAt - touchStart) * 1000)
+        DispatchQueue.main.async {
+            debugLog("pinch: \(kind) recognised \(held) ms after four fingers touched, handled \(Int((CFAbsoluteTimeGetCurrent() - firedAt) * 1000)) ms later")
+            handler?(kind)
+        }
     }
 }
 

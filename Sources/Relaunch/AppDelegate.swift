@@ -320,5 +320,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 /// Set RELAUNCH_DEBUG=1 to trace show/hide on stderr.
 func debugLog(_ s: @autoclosure () -> String) {
     guard ProcessInfo.processInfo.environment["RELAUNCH_DEBUG"] != nil else { return }
-    FileHandle.standardError.write(("Relaunch: " + s() + "\n").data(using: .utf8)!)
+    let ms = Int((CFAbsoluteTimeGetCurrent() * 1000).truncatingRemainder(dividingBy: 100_000))
+    FileHandle.standardError.write(String(format: "%05d Relaunch: %@\n", ms, s()).data(using: .utf8)!)
 }
