@@ -22,12 +22,13 @@ if [ -n "$NOTARY_PROFILE" ] && [ -z "$SIGN_IDENTITY" ]; then
 fi
 
 swift build -c release
-BIN="$(swift build -c release --show-bin-path)/Relaunch"
+BIN_DIR="$(swift build -c release --show-bin-path)"
 
 APP=build/Relaunch.app
 rm -rf "$APP"
-mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
-cp "$BIN" "$APP/Contents/MacOS/Relaunch"
+mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
+cp "$BIN_DIR/Relaunch" "$APP/Contents/MacOS/Relaunch"
+ditto "$BIN_DIR/Sparkle.framework" "$APP/Contents/Frameworks/Sparkle.framework"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
 
 if [ ! -f build/AppIcon.icns ] || [ scripts/make_icon.swift -nt build/AppIcon.icns ]; then
@@ -37,13 +38,20 @@ if [ ! -f build/AppIcon.icns ] || [ scripts/make_icon.swift -nt build/AppIcon.ic
 fi
 cp build/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
+# Sign inside out: Sparkle's helpers, then the framework, then the app.
+# No entitlements needed: no JIT, no unsigned libraries, not sandboxed.
 if [ -n "$SIGN_IDENTITY" ]; then
-  # No entitlements needed: no JIT, no unsigned libraries, not sandboxed.
-  codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$APP"
-  codesign --verify --strict --verbose=2 "$APP"
+  sign() { codesign --force --options runtime --timestamp --sign "$SIGN_IDENTITY" "$@"; }
 else
-  codesign --force --sign - "$APP"
+  sign() { codesign --force --sign - "$@"; }
 fi
+SPARKLE="$APP/Contents/Frameworks/Sparkle.framework/Versions/B"
+sign "$SPARKLE/XPCServices/Installer.xpc"
+sign --preserve-metadata=entitlements "$SPARKLE/XPCServices/Downloader.xpc"
+sign "$SPARKLE/Autoupdate" "$SPARKLE/Updater.app"
+sign "$APP/Contents/Frameworks/Sparkle.framework"
+sign "$APP"
+codesign --verify --deep --strict --verbose=2 "$APP"
 echo "Built $APP"
 
 if [ -n "$NOTARY_PROFILE" ]; then

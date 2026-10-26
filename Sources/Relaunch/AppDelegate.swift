@@ -42,6 +42,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         if CommandLine.arguments.contains("--uninstall") { return Uninstaller.run() }
         let launchedAtLogin = Self.launchedAsLoginItem || CommandLine.arguments.contains("--background")
+            || Updater.consumeRelaunchFlag()
         NSApp.mainMenu = Self.makeMenu()
 
         let t0 = CFAbsoluteTimeGetCurrent()
@@ -53,6 +54,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             debugLog("orderOut")
             self?.window.orderOut(nil)
             NSApp.hide(nil) // hands focus back to the previous app
+            Updater.shared.installIfPending()
         }
 
         LoginItem.sync()
@@ -62,6 +64,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         installPinch()
         watchApplicationFolders()
         watchWallpaper()
+        Updater.shared.isShown = { [weak self] in self?.isShown ?? false }
+        Updater.shared.start()
 
         let nc = NotificationCenter.default
         nc.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in

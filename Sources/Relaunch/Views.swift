@@ -97,6 +97,13 @@ struct BackgroundMenu: View {
         }
         Button("Reset to Default Layout") { model.resetLayout() }
         Divider()
+        if Updater.shared.canCheck {
+            Button("Check for Updates…") {
+                // Sparkle's window would sit under the full-screen grid too.
+                model.hide()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { Updater.shared.checkForUpdates() }
+            }
+        }
         Button("Quit Relaunch") { NSApp.terminate(nil) }
         Button("Uninstall Relaunch…") {
             // Out of the way first: the alert would sit under the full-screen grid.

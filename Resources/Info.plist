@@ -28,13 +28,21 @@
 	<string>14.0</string>
 	<key>LSUIElement</key>
 	<true/>
-	<key>RelaunchSelfUninstall</key>
-	<true/>
 	<key>NSHighResolutionCapable</key>
 	<true/>
 	<key>NSHumanReadableCopyright</key>
 	<string>MIT License. Not affiliated with Apple Inc.</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>RelaunchSelfUninstall</key>
+	<true/>
+	<key>SUAutomaticallyUpdate</key>
+	<true/>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://github.com/STACK-42/relaunch/releases/latest/download/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>O8BfvBFXnHz/uQlATuJDt9LCYgWz49VCwkoXmtLop4Y=</string>
 </dict>
 </plist>
