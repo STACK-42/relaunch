@@ -90,9 +90,19 @@ one ⌘Space away.
 Relaunch runs in the background, so it has no Quit in the Dock or menu bar.
 Everything is in the menu you get by right-clicking the Relaunch background.
 
-**Update:** right-click the background → **Quit Relaunch**, then drag the new
-version into Applications and replace the old one. Your layout and settings
-stay. The Terminal install command does all of this for you.
+**Update:** Relaunch updates itself. It checks for a new release once a day,
+downloads it in the background, and installs it the next time the launcher
+closes. Your layout and settings stay. To check right away, right-click the
+background → **Check for Updates…**. To turn automatic updates off:
+
+```sh
+defaults write com.ahmedalghali.Relaunch SUAutomaticallyUpdate -bool false  # ask before installing
+defaults write com.ahmedalghali.Relaunch SUEnableAutomaticChecks -bool false # stop checking
+```
+
+Versions before 1.2 can't update themselves: quit Relaunch from the right-click
+menu, then drag the new version into Applications or run the Terminal install
+command again.
 
 **Uninstall:** right-click the background → **Uninstall Relaunch…**. It turns
 macOS's own pinch back on (if Relaunch turned it off), removes the login item,
@@ -122,7 +132,7 @@ Trackpad → More Gestures → **Apps**, and remove Relaunch from your Dock.
 | Leave a folder | Drag the app out of the panel |
 | Edit mode (jiggle) | Hold ⌥ |
 | Close | Esc, click empty space, ⌘W |
-| More | Right-click the background: Open at Login, Pinch Opens Only Relaunch, Restore Launchpad Layout, Reset, Quit, Uninstall |
+| More | Right-click the background: Open at Login, Pinch Opens Only Relaunch, Restore Launchpad Layout, Reset, Check for Updates, Quit, Uninstall |
 
 ## Settings
 
