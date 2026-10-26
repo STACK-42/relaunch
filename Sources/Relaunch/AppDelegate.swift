@@ -53,7 +53,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         model.onHide = { [weak self] in
             debugLog("orderOut")
             self?.window.orderOut(nil)
-            NSApp.hide(nil) // hands focus back to the previous app
+            // Only after an alert activated the app: hand focus back.
+            if NSApp.isActive { NSApp.hide(nil) }
             Updater.shared.installIfPending()
         }
 
@@ -111,6 +112,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func show() {
         let mouse = NSEvent.mouseLocation
         let screen = NSScreen.screens.first { NSMouseInRect(mouse, $0.frame, false) } ?? NSScreen.main!
+        let t0 = CFAbsoluteTimeGetCurrent()
         place(on: screen)
         model.prepareToShow()
 
@@ -140,19 +142,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.25, execute: start)
         }
 
-        NSApp.unhide(nil)
-        // Activation jumps to a Space holding one of the app's windows. The
-        // grid is on every Space, but AppKit's text-input helpers for the
-        // search field (TUINSWindow, SPRoundedWindow) stay on the Space they
-        // were created on, and the grid isn't always registered on this Space
-        // by the time activation looks. Put the helpers on every Space too, so
-        // there is nowhere else to jump to.
-        for w in NSApp.windows where w !== window {
-            w.collectionBehavior.insert(.canJoinAllSpaces)
-        }
+        // Don't activate the app. Activating switches to a Space that holds one
+        // of its windows (AppKit's text-input helpers stay on the Space they
+        // were made on), and the round trip through the window server is slow.
+        // The panel takes the keyboard without it, and the app in front stays
+        // in front, so closing needs no hand-back either.
+        if NSApp.isHidden { NSApp.unhideWithoutActivation() }
         window.makeKeyAndOrderFront(nil)
-        if #available(macOS 14, *) { NSApp.activate() } else { NSApp.activate(ignoringOtherApps: true) }
-        debugLog("show on \(screen.frame) visible=\(window.isVisible) key=\(window.isKeyWindow) active=\(NSApp.isActive)")
+        debugLog("show on \(screen.frame) in \(Int((CFAbsoluteTimeGetCurrent() - t0) * 1000)) ms, key=\(window.isKeyWindow)")
     }
 
     private func place(on screen: NSScreen) {
