@@ -1,4 +1,5 @@
 import AppKit
+import os
 import SwiftUI
 
 /// Full-screen, borderless, above the Dock and menu bar, on every Space.
@@ -317,9 +318,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     }
 }
 
-/// Set RELAUNCH_DEBUG=1 to trace show/hide on stderr.
+private let eventLog = Logger(subsystem: "com.ahmedalghali.Relaunch", category: "events")
+private let traceToStderr = ProcessInfo.processInfo.environment["RELAUNCH_DEBUG"] != nil
+
+/// Gestures, opening and closing, and trackpad reconnects go to the system
+/// log, so a pinch that did nothing can be traced after the fact:
+///   log show --last 1d --predicate 'subsystem == "com.ahmedalghali.Relaunch"'
+/// Set RELAUNCH_DEBUG=1 to also print them on stderr.
 func debugLog(_ s: @autoclosure () -> String) {
-    guard ProcessInfo.processInfo.environment["RELAUNCH_DEBUG"] != nil else { return }
+    let message = s()
+    eventLog.notice("\(message, privacy: .public)")
+    guard traceToStderr else { return }
     let ms = Int((CFAbsoluteTimeGetCurrent() * 1000).truncatingRemainder(dividingBy: 100_000))
-    FileHandle.standardError.write(String(format: "%05d Relaunch: %@\n", ms, s()).data(using: .utf8)!)
+    FileHandle.standardError.write(String(format: "%05d Relaunch: %@\n", ms, message).data(using: .utf8)!)
 }
