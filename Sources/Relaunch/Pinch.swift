@@ -16,12 +16,12 @@ final class PinchGesture {
 
     static var enabled: Bool { UserDefaults.standard.object(forKey: "pinch") as? Bool ?? true }
 
-    /// The share of their spread the fingers must close by to open, 0.25 by
+    /// The share of their spread the fingers must close by to open, 0.2 by
     /// default. Spreading back out by the same ratio closes. Lower is more
     /// sensitive: `defaults write com.ahmedalghali.Relaunch pinchDistance -float 0.2`
     private static let distance: Float = {
         let v = UserDefaults.standard.float(forKey: "pinchDistance")
-        return v > 0 ? min(max(v, 0.1), 0.6) : 0.25
+        return v > 0 ? min(max(v, 0.1), 0.6) : 0.2
     }()
 
     private typealias DeviceCreateList = @convention(c) () -> Unmanaged<CFArray>
@@ -63,6 +63,8 @@ final class PinchGesture {
     private static var fired = false
     private static var sawFrame = false
     private static var touchStart: CFAbsoluteTime = 0
+    private static var fingerCount = 0
+    private static var settledAt: CFAbsoluteTime = 0
 
     /// Starts listening. Returns false when the framework isn't available.
     @discardableResult
@@ -200,7 +202,14 @@ final class PinchGesture {
             DispatchQueue.main.async { debugLog("pinch: receiving touches") }
         }
         guard count >= 4, let data else {
+            if maxSpread > 0, !fired {
+                let closed = Int(100 * (1 - minSpread / maxSpread)), max = maxSpread, min = minSpread
+                DispatchQueue.main.async {
+                    debugLog("pinch: four-finger touch ended without firing, spread \(min)...\(max) (\(closed)% range)")
+                }
+            }
             touchStart = 0
+            fingerCount = 0
             minSpread = 0
             maxSpread = 0
             fired = false
@@ -218,7 +227,13 @@ final class PinchGesture {
         spread /= Float(count)
 
         if touchStart == 0 { touchStart = lastFrame }
-        if maxSpread == 0 { minSpread = spread; maxSpread = spread; return }
+        // Fingers still landing or lifting move the average by themselves:
+        // measure from where the fingers are 50 ms after the count changes.
+        if count != fingerCount {
+            fingerCount = count
+            settledAt = lastFrame + 0.05
+        }
+        if lastFrame < settledAt || maxSpread == 0 { minSpread = spread; maxSpread = spread; return }
         minSpread = min(minSpread, spread)
         maxSpread = max(maxSpread, spread)
         guard !fired, minSpread > 0.01 else { return }
