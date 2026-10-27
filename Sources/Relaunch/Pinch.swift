@@ -133,8 +133,18 @@ final class PinchGesture {
     }
 
     private static func watchForResets() {
-        NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.didWakeNotification, object: nil, queue: .main) { _ in reconnect(after: 1) }
+        // After sleep the driver can take a few seconds to come back, and an
+        // early subscription may never receive touches, so subscribe again
+        // once it has settled. Unlocking the screen gets the same treatment.
+        let workspace = NSWorkspace.shared.notificationCenter
+        for name in [NSWorkspace.didWakeNotification, NSWorkspace.screensDidWakeNotification,
+                     NSWorkspace.sessionDidBecomeActiveNotification] {
+            workspace.addObserver(forName: name, object: nil, queue: .main) { note in
+                debugLog("pinch: \(note.name.rawValue), reconnecting")
+                reconnect(after: 1)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 6) { reconnect(after: 0) }
+            }
+        }
 
         // A trackpad appearing or going away (driver reloads included).
         let port = IONotificationPortCreate(kIOMainPortDefault)
