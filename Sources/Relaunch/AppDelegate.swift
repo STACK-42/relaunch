@@ -95,8 +95,12 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         // Each Space can have its own wallpaper.
         NSWorkspace.shared.notificationCenter.addObserver(
-            forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { _ in
+            forName: NSWorkspace.activeSpaceDidChangeNotification, object: nil, queue: .main) { [weak self] _ in
             Wallpaper.prewarm()
+            // Switching Spaces some other way (Control-arrow, Mission Control).
+            guard let self, self.window.isVisible else { return }
+            debugLog("space changed -> hide now")
+            self.model.hideNow()
         }
 
         if !launchedAtLogin {
@@ -201,6 +205,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             debugLog("pinch: \(kind)")
             switch kind {
             case .pinchIn: if !self.isShown { self.show() }
+            // macOS is about to slide to another Space, and the grid would
+            // ride along on top of it and fade out over the new one.
+            case .swipe: if self.isShown { self.model.hideNow() }
             case .spreadOut:
                 if self.isShown { self.model.hide() }
                 // macOS's spread is off along with its pinch; stand in for it.

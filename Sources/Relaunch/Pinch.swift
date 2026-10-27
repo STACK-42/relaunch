@@ -12,7 +12,7 @@ import IOKit
 /// Turn off with `defaults write com.ahmedalghali.Relaunch pinch -bool false`.
 /// How far the fingers must move is `pinchDistance` (see `distance`).
 final class PinchGesture {
-    enum Kind { case pinchIn, spreadOut }
+    enum Kind { case pinchIn, spreadOut, swipe }
 
     static var enabled: Bool { UserDefaults.standard.object(forKey: "pinch") as? Bool ?? true }
 
@@ -65,6 +65,7 @@ final class PinchGesture {
     private static var touchStart: CFAbsoluteTime = 0
     private static var fingerCount = 0
     private static var settledAt: CFAbsoluteTime = 0
+    private static var startCentre = (x: Float(0), y: Float(0))
 
     /// Starts listening. Returns false when the framework isn't available.
     @discardableResult
@@ -204,7 +205,8 @@ final class PinchGesture {
     /// Thumb and three fingers = four or more touches. The gesture is the
     /// average distance of the touches from their centre shrinking (pinch) or
     /// growing (spread) by a clear margin from its widest or narrowest point,
-    /// firing once per gesture.
+    /// firing once per gesture. Four fingers sliding sideways together is the
+    /// system's swipe between Spaces instead.
     private static func frame(_ data: UnsafeRawPointer?, _ count: Int) {
         lastFrame = CFAbsoluteTimeGetCurrent()
         if !sawFrame {
@@ -243,12 +245,19 @@ final class PinchGesture {
             fingerCount = count
             settledAt = lastFrame + 0.05
         }
-        if lastFrame < settledAt || maxSpread == 0 { minSpread = spread; maxSpread = spread; return }
+        if lastFrame < settledAt || maxSpread == 0 {
+            minSpread = spread
+            maxSpread = spread
+            startCentre = (cx, cy)
+            return
+        }
         minSpread = min(minSpread, spread)
         maxSpread = max(maxSpread, spread)
         guard !fired, minSpread > 0.01 else { return }
+        let dx = cx - startCentre.x, dy = cy - startCentre.y
         let kind: Kind? = spread < maxSpread * (1 - distance) ? .pinchIn
-            : spread > minSpread / (1 - distance) ? .spreadOut : nil
+            : spread > minSpread / (1 - distance) ? .spreadOut
+            : abs(dx) > 0.1 && abs(dx) > 2 * abs(dy) ? .swipe : nil
         guard let kind else { return }
         fired = true
         let firedAt = CFAbsoluteTimeGetCurrent(), held = Int((firedAt - touchStart) * 1000)

@@ -222,6 +222,15 @@ final class RelaunchModel {
         }
     }
 
+    /// Closes without the fade, for when the screen is about to change under
+    /// the grid anyway.
+    func hideNow() {
+        isHiding = true
+        cancelDrag()
+        appearance = 0
+        onHide?()
+    }
+
     private func clampPages() {
         main.page = min(main.page, max(0, pages.count - 1))
     }
