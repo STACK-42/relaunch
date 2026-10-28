@@ -62,9 +62,11 @@ final class PinchGesture {
     private static var maxSpread: Float = 0
     private static var fired = false
     private static var sawFrame = false
-    private static var touchStart: CFAbsoluteTime = 0
+    private static var touchStart: Double = 0
+    private static var touchArrived: CFAbsoluteTime = 0
+    private static var frames = 0
     private static var fingerCount = 0
-    private static var settledAt: CFAbsoluteTime = 0
+    private static var settledAt: Double = 0
     private static var startCentre = (x: Float(0), y: Float(0))
 
     /// Starts listening. Returns false when the framework isn't available.
@@ -197,8 +199,8 @@ final class PinchGesture {
         }
     }
 
-    private static let frameCallback: ContactCallback = { _, data, count, _, _ in
-        PinchGesture.frame(data, Int(count))
+    private static let frameCallback: ContactCallback = { _, data, count, timestamp, _ in
+        PinchGesture.frame(data, Int(count), timestamp)
         return 0
     }
 
@@ -207,7 +209,12 @@ final class PinchGesture {
     /// growing (spread) by a clear margin from its widest or narrowest point,
     /// firing once per gesture. Four fingers sliding sideways together is the
     /// system's swipe between Spaces instead.
-    private static func frame(_ data: UnsafeRawPointer?, _ count: Int) {
+    ///
+    /// Timing uses `time`, when the trackpad saw the frame. When Relaunch is
+    /// slow to run (another app busy, memory paged out after a long sleep),
+    /// frames queue up and arrive together, and timing by arrival would see
+    /// the whole gesture as fingers still landing.
+    private static func frame(_ data: UnsafeRawPointer?, _ count: Int, _ time: Double) {
         lastFrame = CFAbsoluteTimeGetCurrent()
         if !sawFrame {
             sawFrame = true
@@ -216,11 +223,14 @@ final class PinchGesture {
         guard count >= 4, let data else {
             if maxSpread > 0, !fired {
                 let closed = Int(100 * (1 - minSpread / maxSpread)), max = maxSpread, min = minSpread
+                let timing = "\(frames) frames over \(Int((time - touchStart) * 1000)) ms, "
+                    + "arriving over \(Int((lastFrame - touchArrived) * 1000)) ms"
                 DispatchQueue.main.async {
-                    debugLog("pinch: four-finger touch ended without firing, spread \(min)...\(max) (\(closed)% range)")
+                    debugLog("pinch: four-finger touch ended without firing, spread \(min)...\(max) (\(closed)% range), \(timing)")
                 }
             }
             touchStart = 0
+            frames = 0
             fingerCount = 0
             minSpread = 0
             maxSpread = 0
@@ -238,14 +248,18 @@ final class PinchGesture {
         for i in 0..<count { spread += hypotf(xs[i] - cx, ys[i] - cy) }
         spread /= Float(count)
 
-        if touchStart == 0 { touchStart = lastFrame }
+        if touchStart == 0 {
+            touchStart = time
+            touchArrived = lastFrame
+        }
+        frames += 1
         // Fingers still landing or lifting move the average by themselves:
         // measure from where the fingers are 50 ms after the count changes.
         if count != fingerCount {
             fingerCount = count
-            settledAt = lastFrame + 0.05
+            settledAt = time + 0.05
         }
-        if lastFrame < settledAt || maxSpread == 0 {
+        if time < settledAt || maxSpread == 0 {
             minSpread = spread
             maxSpread = spread
             startCentre = (cx, cy)
@@ -260,9 +274,10 @@ final class PinchGesture {
             : abs(dx) > 0.1 && abs(dx) > 2 * abs(dy) ? .swipe : nil
         guard let kind else { return }
         fired = true
-        let firedAt = CFAbsoluteTimeGetCurrent(), held = Int((firedAt - touchStart) * 1000)
+        let firedAt = CFAbsoluteTimeGetCurrent(), held = Int((time - touchStart) * 1000)
+        let late = Int((firedAt - touchArrived) * 1000) - held
         DispatchQueue.main.async {
-            debugLog("pinch: \(kind) recognised \(held) ms after four fingers touched, handled \(Int((CFAbsoluteTimeGetCurrent() - firedAt) * 1000)) ms later")
+            debugLog("pinch: \(kind) recognised \(held) ms after four fingers touched (frames \(late) ms late), handled \(Int((CFAbsoluteTimeGetCurrent() - firedAt) * 1000)) ms later")
             handler?(kind)
         }
     }
